@@ -73,4 +73,28 @@ public class BookDO extends BaseDO {
     @ApiModelProperty(value = "图书封面图 url")
     private String image;
 
+    /**
+     * 图书价格
+     */
+    @ApiModelProperty(value = "图书价格")
+    private Integer price;
+
+    /**
+     * 图书库存
+     */
+    @ApiModelProperty(value = "图书库存")
+    private Integer stock;
+
+    /**
+     * 促销活动信息
+     */
+    @ApiModelProperty(value = "促销活动信息")
+    private String promotion;
+
+    /**
+     * 原价
+     */
+    @ApiModelProperty(value = "原价")
+    private Integer originalPrice;
+
 }

@@ -64,4 +64,20 @@ public interface BookService {
      */
     Page<BookDO> getBookListByPage(Integer page, Integer count);
 
+    /**
+     * 更新图书价格
+     *
+     * @param bookId  图书 ID
+     * @param newPrice 新价格
+     */
+    void updateBookPrice(Long bookId, Integer newPrice);
+
+    /**
+     * 更新图书库存
+     *
+     * @param bookId   图书 ID
+     * @param newStock 新库存
+     */
+    void updateBookStock(Long bookId, Integer newStock);
+
 }
