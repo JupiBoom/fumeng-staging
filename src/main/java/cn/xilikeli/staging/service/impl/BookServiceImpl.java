@@ -8,6 +8,7 @@ import cn.xilikeli.staging.dto.book.BookDTO;
 import cn.xilikeli.staging.model.BookDO;
 import cn.xilikeli.staging.repository.BookRepository;
 import cn.xilikeli.staging.service.BookService;
+import cn.xilikeli.staging.service.NotificationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,10 +32,16 @@ import java.util.List;
 public class BookServiceImpl implements BookService {
 
     private BookRepository bookRepository;
+    private NotificationService notificationService;
 
     @Autowired
     public void setBookRepository(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
+    }
+
+    @Autowired
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -57,6 +64,22 @@ public class BookServiceImpl implements BookService {
     public void updateBookById(Long bookId, BookDTO bookDTO) {
         BookDO bookDO = this.getBookById(bookId);
         this.checkBookDTO(bookDTO, bookDO);
+
+        // 检查价格是否降低
+        if (bookDTO.getPrice() != null && bookDTO.getPrice() < bookDO.getPrice()) {
+            this.notificationService.sendPriceDownNotification(bookId, bookDO.getPrice(), bookDTO.getPrice());
+        }
+
+        // 检查库存是否从 0 恢复
+        if (bookDTO.getStock() != null && bookDO.getStock() == 0 && bookDTO.getStock() > 0) {
+            this.notificationService.sendStockRecoverNotification(bookId);
+        }
+
+        // 检查促销信息是否更新
+        if (bookDTO.getPromotion() != null && !bookDTO.getPromotion().equals(bookDO.getPromotion())) {
+            this.notificationService.sendPromotionNotification(bookId, bookDTO.getPromotion());
+        }
+
         BeanUtils.copyProperties(bookDTO, bookDO);
         this.bookRepository.save(bookDO);
     }
@@ -97,6 +120,26 @@ public class BookServiceImpl implements BookService {
             count = this.bookRepository.countByTitleAndIdNot(bookDTO.getTitle(), bookDO.getId());
         }
         Assert.checkArgument(count > 0, BookCodeConstant.BOOK_TITLE_REPEAT);
+    }
+
+    @Override
+    public void updateBookPrice(Long bookId, Integer newPrice) {
+        BookDO bookDO = this.getBookById(bookId);
+        if (newPrice < bookDO.getPrice()) {
+            this.notificationService.sendPriceDownNotification(bookId, bookDO.getPrice(), newPrice);
+        }
+        bookDO.setPrice(newPrice);
+        this.bookRepository.save(bookDO);
+    }
+
+    @Override
+    public void updateBookStock(Long bookId, Integer newStock) {
+        BookDO bookDO = this.getBookById(bookId);
+        if (bookDO.getStock() == 0 && newStock > 0) {
+            this.notificationService.sendStockRecoverNotification(bookId);
+        }
+        bookDO.setStock(newStock);
+        this.bookRepository.save(bookDO);
     }
 
 }
