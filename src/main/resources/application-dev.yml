@@ -27,6 +27,7 @@ spring:
       hibernate:
         show_sql: true # 显示 sql 语句
         format_sql: true # 格式化 sql 语句
+        dialect: org.hibernate.dialect.MySQL8Dialect # MySQL 方言
 
 # 项目自定义配置项
 staging:
