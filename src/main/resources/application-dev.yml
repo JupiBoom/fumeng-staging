@@ -2,7 +2,7 @@
 
 server:
   # 服务端口
-  port: 8082
+  port: 8083
 
 spring:
   # 数据源配置
@@ -27,6 +27,7 @@ spring:
       hibernate:
         show_sql: true # 显示 sql 语句
         format_sql: true # 格式化 sql 语句
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect # MySQL 方言
 
 # 项目自定义配置项
 staging:
