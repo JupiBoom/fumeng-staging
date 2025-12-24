@@ -94,3 +94,102 @@ CREATE TABLE IF NOT EXISTS `account_identity`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci
   COMMENT = '用户认证信息表';
+
+-- ----------------------------
+-- 商品表
+-- ----------------------------
+DROP TABLE IF EXISTS `product`;
+CREATE TABLE `product`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '商品 ID, 自增主键',
+    `name`        VARCHAR(100)     NOT NULL DEFAULT '' COMMENT '商品名称',
+    `description` VARCHAR(2000)    NOT NULL DEFAULT '' COMMENT '商品描述',
+    `price`       DECIMAL(10,2)    NOT NULL DEFAULT '0.00' COMMENT '商品价格',
+    `stock`       INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '商品库存',
+    `image`       VARCHAR(255)     NOT NULL DEFAULT '' COMMENT '商品封面图 url',
+    `category`    VARCHAR(50)      NOT NULL DEFAULT '' COMMENT '商品分类',
+    `status`      TINYINT(3) UNSIGNED NOT NULL DEFAULT '1' COMMENT '商品状态: 1-上架, 0-下架',
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    `delete_time` DATETIME(3) DEFAULT NULL COMMENT '删除时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  COMMENT = '商品表';
+
+-- ----------------------------
+-- 订单表
+-- ----------------------------
+DROP TABLE IF EXISTS `order`;
+CREATE TABLE `order`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '订单 ID, 自增主键',
+    `order_no`    VARCHAR(32)      NOT NULL DEFAULT '' COMMENT '订单编号',
+    `account_id`  BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '用户 ID',
+    `product_id`  BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '商品 ID',
+    `quantity`    INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '购买数量',
+    `total_price` DECIMAL(10,2)    NOT NULL DEFAULT '0.00' COMMENT '订单总价',
+    `status`      TINYINT(3) UNSIGNED NOT NULL DEFAULT '1' COMMENT '订单状态: 1-待支付, 2-已支付, 3-已发货, 4-已完成, 5-已取消',
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    `delete_time` DATETIME(3) DEFAULT NULL COMMENT '删除时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_order_no` (`order_no`),
+    KEY `idx_account_id` (`account_id`),
+    KEY `idx_product_id` (`product_id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  COMMENT = '订单表';
+
+-- ----------------------------
+-- 评价表
+-- ----------------------------
+DROP TABLE IF EXISTS `review`;
+CREATE TABLE `review`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '评价 ID, 自增主键',
+    `account_id`  BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '用户 ID',
+    `product_id`  BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '商品 ID',
+    `order_id`    BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '订单 ID',
+    `rating`      TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' COMMENT '评分(1-5)',
+    `content`     VARCHAR(2000)    NOT NULL DEFAULT '' COMMENT '评价内容',
+    `status`      TINYINT(3) UNSIGNED NOT NULL DEFAULT '1' COMMENT '评价状态: 1-正常, 0-隐藏',
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    `delete_time` DATETIME(3) DEFAULT NULL COMMENT '删除时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_account_id` (`account_id`),
+    KEY `idx_product_id` (`product_id`),
+    KEY `idx_order_id` (`order_id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  COMMENT = '评价表';
+
+-- ----------------------------
+-- 商品评分统计表
+-- ----------------------------
+DROP TABLE IF EXISTS `product_rating_stat`;
+CREATE TABLE `product_rating_stat`
+(
+    `id`          BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '统计 ID, 自增主键',
+    `product_id`  BIGINT(20) UNSIGNED NOT NULL DEFAULT '0' COMMENT '商品 ID',
+    `total_reviews` INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT '总评价数',
+    `total_rating` DECIMAL(10,2)    NOT NULL DEFAULT '0.00' COMMENT '总评分',
+    `average_rating` DECIMAL(3,2)    NOT NULL DEFAULT '0.00' COMMENT '平均评分',
+    `positive_rate` DECIMAL(5,2)    NOT NULL DEFAULT '0.00' COMMENT '好评率',
+    `create_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
+    `update_time` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新时间',
+    `delete_time` DATETIME(3) DEFAULT NULL COMMENT '删除时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_product_id` (`product_id`)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+  COMMENT = '商品评分统计表';
